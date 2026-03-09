@@ -18,12 +18,25 @@ from flask_cors import CORS
 from fill_xcg_form import fill_xcg_form_bytes
 
 app = Flask(__name__)
-CORS(app)  # Permite requests desde el formulario web en Netlify
+CORS(app, resources={r"/*": {"origins": "*"}}, 
+     supports_credentials=False,
+     allow_headers=["Content-Type"],
+     methods=["GET", "POST", "OPTIONS"])
+
+@app.after_request
+def after_request(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+    response.headers.add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+    return response
 
 # ── Configuración (variables de entorno en Railway) ──────────────────────────
-ADMIN_EMAIL    = os.environ.get("ADMIN_EMAIL",    "ramiro.olbina@gmail.com")
-GMAIL_USER     = os.environ.get("GMAIL_USER",     "")   # tu Gmail
-GMAIL_PASSWORD = os.environ.get("GMAIL_PASSWORD", "")   # contraseña de app Gmail
+# ADMIN_EMAIL puede ser uno o varios separados por coma:
+# ej: "ramiro.olbina@gmail.com,otro@gmail.com,tercero@hotmail.com"
+_admin_raw   = os.environ.get("ADMIN_EMAIL", "ramiro.olbina@gmail.com")
+ADMIN_EMAILS = [e.strip() for e in _admin_raw.split(",") if e.strip()]
+GMAIL_USER     = os.environ.get("GMAIL_USER",     "")
+GMAIL_PASSWORD = os.environ.get("GMAIL_PASSWORD", "")
 PDF_BASE_PATH  = os.path.join(os.path.dirname(__file__), "formulario_xcg_base.pdf")
 
 
@@ -57,7 +70,7 @@ def submit():
         # ── Enviar email con PDF adjunto ───────────────────────────────────────
         if GMAIL_USER and GMAIL_PASSWORD:
             send_email_with_pdf(
-                to=ADMIN_EMAIL,
+                to=ADMIN_EMAILS,
                 subject=f"🇨🇼 Nuevo cliente XCG: {nombre_completo}",
                 body=build_email_body(data),
                 pdf_bytes=pdf_bytes,
@@ -153,10 +166,13 @@ def map_form_to_xcg(raw):
 
 
 def send_email_with_pdf(to, subject, body, pdf_bytes, filename):
-    """Envía email con el PDF como adjunto usando Gmail SMTP."""
+    """Envía email con el PDF como adjunto usando Gmail SMTP.
+    to puede ser un string o una lista de emails."""
+    if isinstance(to, str):
+        to = [t.strip() for t in to.split(",") if t.strip()]
     msg = MIMEMultipart()
     msg["From"]    = GMAIL_USER
-    msg["To"]      = to
+    msg["To"]      = ", ".join(to)
     msg["Subject"] = subject
 
     msg.attach(MIMEText(body, "plain", "utf-8"))
@@ -169,7 +185,7 @@ def send_email_with_pdf(to, subject, body, pdf_bytes, filename):
     # Enviar via Gmail SMTP
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
         smtp.login(GMAIL_USER, GMAIL_PASSWORD)
-        smtp.sendmail(GMAIL_USER, to, msg.as_string())
+        smtp.sendmail(GMAIL_USER, to, msg.as_string())  # to is a list
 
 
 def build_email_body(data):
