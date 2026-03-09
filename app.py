@@ -183,7 +183,10 @@ def send_email_with_pdf(to, subject, body, pdf_bytes, filename):
     msg.attach(pdf_part)
 
     # Enviar via Gmail SMTP
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+    with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
+        smtp.ehlo()
+        smtp.starttls()
+        smtp.ehlo()
         smtp.login(GMAIL_USER, GMAIL_PASSWORD)
         smtp.sendmail(GMAIL_USER, to, msg.as_string())  # to is a list
 
