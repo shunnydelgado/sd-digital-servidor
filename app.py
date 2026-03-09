@@ -177,18 +177,13 @@ def send_email_with_pdf(to, subject, body, pdf_bytes, filename):
 
     msg.attach(MIMEText(body, "plain", "utf-8"))
 
-    # Adjuntar PDF
     pdf_part = MIMEApplication(pdf_bytes, _subtype="pdf")
     pdf_part.add_header("Content-Disposition", "attachment", filename=filename)
     msg.attach(pdf_part)
 
-    # Enviar via Gmail SMTP
-    with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
-        smtp.ehlo()
-        smtp.starttls()
-        smtp.ehlo()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
         smtp.login(GMAIL_USER, GMAIL_PASSWORD)
-        smtp.sendmail(GMAIL_USER, to, msg.as_string())  # to is a list
+        smtp.sendmail(GMAIL_USER, to, msg.as_string())
 
 
 def build_email_body(data):
