@@ -1,0 +1,67 @@
+# 🚀 GUÍA DE DEPLOY — SD Digital Solutions Servidor PDF
+# =========================================================
+# Tiempo estimado: 15 minutos
+# Costo: GRATIS (Railway plan hobby = $5 crédito/mes gratis)
+
+## PASO 1 — Crear cuenta en GitHub (si no tienes)
+   → https://github.com → Sign up (gratis)
+
+## PASO 2 — Subir los archivos del servidor a GitHub
+   1. En GitHub → "New repository" → nombre: "sd-digital-servidor"
+   2. Marca: ✅ Public → Create repository
+   3. Clic en "uploading an existing file"
+   4. Arrastra ESTOS archivos:
+      - app.py
+      - fill_xcg_form.py
+      - requirements.txt
+      - Procfile
+      - formulario_xcg_base.pdf   ← el PDF original de Curaçao
+   5. Clic "Commit changes"
+
+## PASO 3 — Deploy en Railway
+   1. Ve a → https://railway.app
+   2. "Login with GitHub"
+   3. Clic → "New Project" → "Deploy from GitHub repo"
+   4. Selecciona "sd-digital-servidor"
+   5. Railway detecta automáticamente el Procfile → Deploy empieza solo
+   6. Espera ~2 minutos ⏳
+
+## PASO 4 — Configurar variables de entorno en Railway
+   En tu proyecto Railway → "Variables" → agregar:
+
+   ADMIN_EMAIL     = ramiro.olbina@gmail.com
+   GMAIL_USER      = tu-gmail@gmail.com
+   GMAIL_PASSWORD  = (contraseña de aplicación Gmail — ver Paso 4b)
+
+## PASO 4b — Crear contraseña de aplicación Gmail
+   1. Ve a → https://myaccount.google.com/security
+   2. "Verificación en 2 pasos" → actívala si no está activa
+   3. Busca "Contraseñas de aplicación"
+   4. Selecciona "Otra (nombre personalizado)" → nombre: "SD Digital"
+   5. Copia la contraseña de 16 caracteres → pégala en GMAIL_PASSWORD
+
+## PASO 5 — Obtener la URL del servidor
+   En Railway → tu proyecto → "Settings" → "Domains"
+   → Copia la URL, ejemplo: https://sd-digital-servidor-production.railway.app
+
+## PASO 6 — Actualizar el formulario web
+   1. Abre el archivo index.html (el formulario de SD Digital)
+   2. Busca esta línea:
+      const SERVER_URL = 'https://TU-SERVIDOR.railway.app/submit';
+   3. Reemplaza con tu URL real:
+      const SERVER_URL = 'https://sd-digital-servidor-production.railway.app/submit';
+   4. Vuelve a subir el index.html a Netlify
+
+## PASO 7 — Probar
+   1. Abre tu formulario web en Netlify
+   2. Llena los datos de un cliente de prueba
+   3. Clic "Enviar Registro"
+   4. En ~5 segundos recibirás en ramiro.olbina@gmail.com:
+      - Email con todos los datos del cliente
+      - 📎 PDF adjunto: formulario XCG oficial pre-llenado ✅
+
+## ✅ FLUJO AUTOMÁTICO COMPLETO
+   Cliente → Formulario web → Servidor → PDF generado → Email a ti
+
+## ❓ SOPORTE
+   Si hay errores, en Railway → "Logs" puedes ver qué pasó exactamente.

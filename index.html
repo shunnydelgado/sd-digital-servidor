@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SD Digital Solutions — Registro de Clientes</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0b0f1a; --surface: #111827; --surface2: #1a2236;
+      --border: #1f2d45; --border-hover: #2d4163;
+      --accent: #3b82f6; --accent-glow: rgba(59,130,246,0.15); --accent2: #06b6d4;
+      --text: #e2e8f0; --muted: #64748b; --danger: #ef4444;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,0.08), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(6,182,212,0.05), transparent);
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      background: rgba(17,24,39,0.9); backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-inner {
+      max-width: 860px; margin: 0 auto; padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px; color: #fff; letter-spacing: -0.5px;
+      box-shadow: 0 0 20px rgba(59,130,246,0.3);
+    }
+    .logo-text { font-weight: 700; font-size: 16px; }
+    .logo-sub { font-size: 11px; color: var(--muted); }
+    .lang-switcher { display: flex; gap: 4px; }
+    .lang-btn {
+      padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted);
+      font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .lang-btn:hover { color: var(--text); border-color: var(--border-hover); }
+    .lang-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    main { max-width: 860px; margin: 0 auto; padding: 36px 24px 60px; }
+    .page-title { margin-bottom: 28px; }
+    .page-title h2 { font-size: 22px; font-weight: 700; }
+    .page-title p { font-size: 14px; color: var(--muted); margin-top: 4px; }
+    .alert {
+      padding: 12px 16px; border-radius: 10px; margin-bottom: 24px;
+      font-size: 14px; display: flex; align-items: center; gap: 8px;
+      animation: slideIn 0.3s ease;
+    }
+    .alert-success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #34d399; }
+    @keyframes slideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; margin-bottom: 16px; transition: border-color 0.2s;
+    }
+    .card:hover { border-color: var(--border-hover); }
+    .card-title {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .col-2 { grid-column: span 2; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } .col-2 { grid-column: span 1; } }
+    label {
+      display: block; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    input, select {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 14px;
+      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+      transition: all 0.2s; outline: none;
+    }
+    input::placeholder { color: var(--muted); }
+    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    select {
+      cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
+    }
+    select option { background: #1a2236; }
+    .hijo-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 10px; }
+    .hijo-row > div { flex: 1; }
+    .btn-remove {
+      background: transparent; border: 1px solid rgba(239,68,68,0.3);
+      color: var(--danger); border-radius: 8px; padding: 9px 12px;
+      cursor: pointer; font-size: 14px; transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-remove:hover { background: rgba(239,68,68,0.1); border-color: var(--danger); }
+    .btn-add {
+      background: var(--surface2); border: 1px dashed var(--border-hover);
+      color: var(--muted); border-radius: 8px; padding: 8px 14px;
+      cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+    }
+    .btn-add:hover { color: var(--text); border-color: var(--accent); background: var(--accent-glow); }
+    .btn-submit {
+      width: 100%; background: linear-gradient(135deg, var(--accent), #1d4ed8);
+      border: none; border-radius: 12px; padding: 14px;
+      color: #fff; font-family: 'DM Sans', sans-serif;
+      font-size: 15px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; margin-top: 8px;
+      box-shadow: 0 4px 24px rgba(59,130,246,0.3);
+    }
+    .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 32px rgba(59,130,246,0.4); }
+    .btn-submit:active { transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">SD</div>
+      <div>
+        <div class="logo-text">SD Digital Solutions</div>
+        <div class="logo-sub">VTTV — <span id="logo-tagline">Registro de Clientes</span></div>
+      </div>
+    </div>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('es')">🇪🇨 ES</button>
+      <button class="lang-btn" onclick="setLang('en')">🇺🇸 EN</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="alert-success" class="alert alert-success" style="display:none">
+    ✅ <span id="alert-text">Registro enviado exitosamente. ¡Gracias!</span>
+  </div>
+
+  <div class="page-title">
+    <h2 id="title-main">Información del Cliente</h2>
+    <p id="title-sub">Complete todos los campos del formulario de registro.</p>
+  </div>
+
+  <!-- DATOS PERSONALES -->
+  <div class="card">
+    <div class="card-title"><span id="sec-personal">📋 Datos Personales</span></div>
+    <div class="grid-2">
+      <div>
+        <label id="lbl-apellido">Apellido</label>
+        <input id="apellido" type="text" placeholder="Apellido del cliente"/>
+      </div>
+      <div>
+        <label id="lbl-nombre">Nombre</label>
+        <input id="nombre" type="text" placeholder="Nombre del cliente"/>
+      </div>
+      <div class="col-2">
+        <label id="lbl-direccion">Dirección País de Origen</label>
+        <input id="direccion" type="text" placeholder="Dirección completa en su país de origen"/>
+      </div>
+      <div>
+        <label id="lbl-fnac">Fecha de Nacimiento</label>
+        <input id="fechaNacimiento" type="date"/>
+      </div>
+      <div>
+        <label id="lbl-civil">Estado Civil</label>
+        <select id="estadoCivil">
+          <option value="" id="opt-select">Seleccionar...</option>
+          <option id="opt-soltero">Soltero/a</option>
+          <option id="opt-casado">Casado/a</option>
+          <option id="opt-divorciado">Divorciado/a</option>
+          <option id="opt-viudo">Viudo/a</option>
+          <option id="opt-union">Unión libre</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATOS MATRIMONIALES -->
+  <div class="card">
+    <div class="card-title"><span id="sec-matrimonial">💍 Datos Matrimoniales</span></div>
+    <div class="grid-2">
+      <div>
+        <label id="lbl-conyuge">Nombre del Cónyuge</label>
+        <input id="nombreConyuge" type="text" placeholder="Nombre completo del cónyuge"/>
+      </div>
+      <div>
+        <label id="lbl-fmat">Fecha de Matrimonio</label>
+        <input id="fechaMatrimonio" type="date"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIJOS -->
+  <div class="card">
+    <div class="card-title">
+      <span id="sec-hijos">👨‍👩‍👧 Hijos</span>
+      <button class="btn-add" onclick="addHijo()">+ <span id="btn-add-text">Agregar hijo</span></button>
+    </div>
+    <div id="hijos-container"></div>
+  </div>
+
+  <button class="btn-submit" onclick="saveRecord()">
+    <span id="btn-submit-text">📨 Enviar Registro</span>
+  </button>
+</main>
+
+<script>
+  let lang = 'es';
+  let hijoCount = 0;
+
+  const T = {
+    es: {
+      logoTagline: 'Registro de Clientes',
+      titleMain: 'Información del Cliente',
+      titleSub: 'Complete todos los campos del formulario de registro.',
+      secPersonal: '📋 Datos Personales',
+      secMatrimonial: '💍 Datos Matrimoniales',
+      secHijos: '👨‍👩‍👧 Hijos',
+      lblApellido: 'Apellido', phApellido: 'Apellido del cliente',
+      lblNombre: 'Nombre', phNombre: 'Nombre del cliente',
+      lblDireccion: 'Dirección País de Origen', phDireccion: 'Dirección completa en su país de origen',
+      lblFnac: 'Fecha de Nacimiento',
+      lblCivil: 'Estado Civil',
+      optSelect: 'Seleccionar...',
+      optSoltero: 'Soltero/a', optCasado: 'Casado/a', optDivorciado: 'Divorciado/a',
+      optViudo: 'Viudo/a', optUnion: 'Unión libre',
+      lblConyuge: 'Nombre del Cónyuge', phConyuge: 'Nombre completo del cónyuge',
+      lblFmat: 'Fecha de Matrimonio',
+      btnAdd: 'Agregar hijo',
+      btnSubmit: '📨 Enviar Registro',
+      hijoNombreLabel: 'Nombre del hijo', hijoNombrePh: 'Nombre completo',
+      hijoFechaLabel: 'Fecha de Nacimiento',
+      alertOk: 'Registro enviado exitosamente. ¡Gracias!',
+      validationMsg: 'Por favor ingresa al menos el nombre y apellido.',
+      ninguno: 'Ninguno',
+    },
+    en: {
+      logoTagline: 'Client Registration',
+      titleMain: 'Client Information',
+      titleSub: 'Please fill in all fields of the registration form.',
+      secPersonal: '📋 Personal Information',
+      secMatrimonial: '💍 Marriage Information',
+      secHijos: '👨‍👩‍👧 Children',
+      lblApellido: 'Last Name', phApellido: "Client's last name",
+      lblNombre: 'First Name', phNombre: "Client's first name",
+      lblDireccion: 'Country of Origin Address', phDireccion: 'Full address in your country of origin',
+      lblFnac: 'Date of Birth',
+      lblCivil: 'Marital Status',
+      optSelect: 'Select...',
+      optSoltero: 'Single', optCasado: 'Married', optDivorciado: 'Divorced',
+      optViudo: 'Widowed', optUnion: 'Common-law',
+      lblConyuge: "Spouse's Name", phConyuge: "Spouse's full name",
+      lblFmat: 'Marriage Date',
+      btnAdd: 'Add child',
+      btnSubmit: '📨 Submit Registration',
+      hijoNombreLabel: "Child's name", hijoNombrePh: 'Full name',
+      hijoFechaLabel: 'Date of Birth',
+      alertOk: 'Registration submitted successfully. Thank you!',
+      validationMsg: 'Please enter at least the first and last name.',
+      ninguno: 'None',
+    }
+  };
+
+  function setLang(l) {
+    lang = l;
+    const t = T[l];
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');
+
+    document.getElementById('logo-tagline').textContent  = t.logoTagline;
+    document.getElementById('title-main').textContent    = t.titleMain;
+    document.getElementById('title-sub').textContent     = t.titleSub;
+    document.getElementById('sec-personal').textContent  = t.secPersonal;
+    document.getElementById('sec-matrimonial').textContent = t.secMatrimonial;
+    document.getElementById('sec-hijos').textContent     = t.secHijos;
+    document.getElementById('lbl-apellido').textContent  = t.lblApellido;
+    document.getElementById('lbl-nombre').textContent    = t.lblNombre;
+    document.getElementById('lbl-direccion').textContent = t.lblDireccion;
+    document.getElementById('lbl-fnac').textContent      = t.lblFnac;
+    document.getElementById('lbl-civil').textContent     = t.lblCivil;
+    document.getElementById('lbl-conyuge').textContent   = t.lblConyuge;
+    document.getElementById('lbl-fmat').textContent      = t.lblFmat;
+    document.getElementById('btn-add-text').textContent  = t.btnAdd;
+    document.getElementById('btn-submit-text').textContent = t.btnSubmit;
+
+    document.getElementById('apellido').placeholder    = t.phApellido;
+    document.getElementById('nombre').placeholder      = t.phNombre;
+    document.getElementById('direccion').placeholder   = t.phDireccion;
+    document.getElementById('nombreConyuge').placeholder = t.phConyuge;
+
+    document.getElementById('opt-select').textContent    = t.optSelect;
+    document.getElementById('opt-soltero').textContent   = t.optSoltero;
+    document.getElementById('opt-casado').textContent    = t.optCasado;
+    document.getElementById('opt-divorciado').textContent = t.optDivorciado;
+    document.getElementById('opt-viudo').textContent     = t.optViudo;
+    document.getElementById('opt-union').textContent     = t.optUnion;
+
+    // Update dynamic hijo rows
+    document.querySelectorAll('.hijo-nombre-label').forEach(el => el.textContent = t.hijoNombreLabel);
+    document.querySelectorAll('.hijo-fecha-label').forEach(el => el.textContent = t.hijoFechaLabel);
+    document.querySelectorAll('.hijo-nombre').forEach(el => el.placeholder = t.hijoNombrePh);
+  }
+
+  function addHijo() {
+    hijoCount++;
+    const id = 'hijo_' + hijoCount;
+    const t = T[lang];
+    const row = document.createElement('div');
+    row.className = 'hijo-row';
+    row.id = id;
+    row.innerHTML = `
+      <div>
+        <label class="hijo-nombre-label">${t.hijoNombreLabel}</label>
+        <input type="text" placeholder="${t.hijoNombrePh}" class="hijo-nombre"/>
+      </div>
+      <div>
+        <label class="hijo-fecha-label">${t.hijoFechaLabel}</label>
+        <input type="date" class="hijo-fecha"/>
+      </div>
+      <button class="btn-remove" onclick="removeHijo('${id}')">✕</button>
+    `;
+    document.getElementById('hijos-container').appendChild(row);
+  }
+
+  function removeHijo(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  }
+
+  function getHijos() {
+    return Array.from(document.querySelectorAll('#hijos-container .hijo-row')).map(r => ({
+      nombre: r.querySelector('.hijo-nombre').value.trim(),
+      fecha:  r.querySelector('.hijo-fecha').value
+    })).filter(h => h.nombre);
+  }
+
+  // ⚙️ URL del servidor Railway — actualizar después del deploy
+  const SERVER_URL = 'https://TU-SERVIDOR.railway.app/submit';
+  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyF1q-LGkNROvGJhZDVVhNUobjBVM1aRA7jc9z4X6s6YOnf7SY8Y9alGoP6smvmJLfoqw/exec';
+
+  async function saveRecord() {
+    const t = T[lang];
+    const btn = document.getElementById('btn-submit-text');
+
+    const rec = {
+      apellido:        document.getElementById('apellido').value.trim(),
+      nombre:          document.getElementById('nombre').value.trim(),
+      direccion:       document.getElementById('direccion').value.trim(),
+      fechaNacimiento: document.getElementById('fechaNacimiento').value,
+      estadoCivil:     document.getElementById('estadoCivil').value,
+      nombreConyuge:   document.getElementById('nombreConyuge').value.trim(),
+      fechaMatrimonio: document.getElementById('fechaMatrimonio').value,
+      hijos:           getHijos(),
+      fecha:           new Date().toLocaleDateString('es-EC', {day:'2-digit',month:'2-digit',year:'numeric'})
+    };
+
+    if (!rec.apellido || !rec.nombre) { alert(t.validationMsg); return; }
+
+    // Mostrar estado de carga
+    btn.textContent = '⏳ Generando PDF...';
+
+    // Payload completo para el servidor
+    const payload = {
+      apellido:        rec.apellido,
+      nombre:          rec.nombre,
+      direccion:       rec.direccion       || '',
+      fechaNacimiento: rec.fechaNacimiento || '',
+      estadoCivil:     rec.estadoCivil     || '',
+      nombreConyuge:   rec.nombreConyuge   || '',
+      fechaMatrimonio: rec.fechaMatrimonio || '',
+      hijos:           rec.hijos,
+      fecha:           rec.fecha
+    };
+
+    // 1️⃣ Enviar al servidor → genera PDF y envía email automáticamente
+    let serverOk = false;
+    try {
+      const res = await fetch(SERVER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+      serverOk = json.result === 'success';
+    } catch(e) { console.warn('Server error:', e); }
+
+    // 2️⃣ También guardar en Google Sheets (backup)
+    try {
+      await fetch(SHEETS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch(e) { console.warn('Sheets error:', e); }
+
+    // Limpiar formulario
+    ['apellido','nombre','direccion','fechaNacimiento','estadoCivil','nombreConyuge','fechaMatrimonio']
+      .forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('hijos-container').innerHTML = '';
+    hijoCount = 0;
+    addHijo();
+
+    // Restaurar botón
+    btn.textContent = t.btnSubmit || '📨 Enviar Registro';
+
+    // Mensaje de éxito
+    const msg = serverOk
+      ? (lang === 'es'
+          ? '✅ Registro enviado. El formulario XCG fue generado y enviado a ramiro.olbina@gmail.com'
+          : '✅ Record submitted. The XCG form was generated and sent to ramiro.olbina@gmail.com')
+      : t.alertOk;
+
+    document.getElementById('alert-text').textContent = msg;
+    const alertEl = document.getElementById('alert-success');
+    alertEl.style.display = 'flex';
+    setTimeout(() => alertEl.style.display = 'none', 6000);
+  }
+
+  addHijo();
+</script>
+</body>
+</html>
